@@ -57,7 +57,7 @@ export default function Transactions() {
   const [sortBy, setSortBy] = useState<"date" | "amount">("date");
   const [sortDir, setSortDir] = useState<"asc" | "desc">("desc");
 
-  const [isFormOpen, setIsFormOpen] = useState(false);
+  const [isFormOpen, setIsFormOpen] = useState<boolean>(false);
   const [editingTx, setEditingTx] = useState<any>(null);
 
   // Form state
@@ -173,7 +173,7 @@ export default function Transactions() {
       setSortDir("desc");
     }
   };
-console.log(filteredTransactions);
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -225,7 +225,7 @@ console.log(filteredTransactions);
 
             <div className="flex w-full sm:w-auto items-center gap-2 flex-wrap">
               <Select value={typeFilter} onValueChange={setTypeFilter}>
-                <SelectTrigger className="w-[110px]">
+                <SelectTrigger className="w-27.5">
                   <Filter className="w-4 h-4 mr-2 text-muted-foreground" />
                   <SelectValue placeholder="Type" />
                 </SelectTrigger>
@@ -237,7 +237,7 @@ console.log(filteredTransactions);
               </Select>
 
               <Select value={categoryFilter} onValueChange={setCategoryFilter}>
-                <SelectTrigger className="w-[140px]">
+                <SelectTrigger className="w-27.5">
                   <SelectValue placeholder="Category" />
                 </SelectTrigger>
                 <SelectContent>
@@ -374,7 +374,7 @@ console.log(filteredTransactions);
           if (!open) resetForm();
         }}
       >
-        <DialogContent className="sm:max-w-[425px]">
+        <DialogContent className="sm:max-w-106.25">
           <DialogHeader>
             <DialogTitle>
               {editingTx ? "Edit Transaction" : "New Transaction"}
