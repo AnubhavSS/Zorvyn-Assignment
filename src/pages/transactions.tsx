@@ -1,10 +1,18 @@
 import React, { useState, useMemo } from "react";
 import { useStore } from "@/lib/store";
 import { motion, AnimatePresence } from "framer-motion";
-import { 
-  Plus, Search, Filter, Download, FileText,
-  ArrowUpRight, ArrowDownRight, MoreHorizontal,
-  Edit2, Trash2, ArrowUpDown
+import {
+  Plus,
+  Search,
+  Filter,
+  Download,
+  FileText,
+  ArrowUpRight,
+  ArrowDownRight,
+  MoreHorizontal,
+  Edit2,
+  Trash2,
+  ArrowUpDown,
 } from "lucide-react";
 import { format, parseISO } from "date-fns";
 import { Button } from "@/components/ui/button";
@@ -35,8 +43,14 @@ import { CATEGORIES } from "@/lib/mock-data";
 import { cn } from "@/lib/utils";
 
 export default function Transactions() {
-  const { transactions, role, addTransaction, updateTransaction, deleteTransaction } = useStore();
-  
+  const {
+    transactions,
+    role,
+    addTransaction,
+    updateTransaction,
+    deleteTransaction,
+  } = useStore();
+
   const [search, setSearch] = useState("");
   const [typeFilter, setTypeFilter] = useState("all");
   const [categoryFilter, setCategoryFilter] = useState("all");
@@ -52,14 +66,17 @@ export default function Transactions() {
     amount: "",
     type: "expense",
     category: CATEGORIES[0],
-    date: new Date().toISOString().split('T')[0]
+    date: new Date().toISOString().split("T")[0],
   });
 
   const filteredTransactions = useMemo(() => {
-    let result = transactions.filter(t => {
-      const matchSearch = t.description.toLowerCase().includes(search.toLowerCase());
+    let result = transactions.filter((t) => {
+      const matchSearch = t.description
+        .toLowerCase()
+        .includes(search.toLowerCase());
       const matchType = typeFilter === "all" || t.type === typeFilter;
-      const matchCat = categoryFilter === "all" || t.category === categoryFilter;
+      const matchCat =
+        categoryFilter === "all" || t.category === categoryFilter;
       return matchSearch && matchType && matchCat;
     });
 
@@ -80,31 +97,40 @@ export default function Transactions() {
     const headers = ["ID", "Date", "Type", "Category", "Description", "Amount"];
     const csvContent = [
       headers.join(","),
-      ...filteredTransactions.map(t => 
-        `${t.id},${t.date},${t.type},${t.category},"${t.description}",${t.amount}`
-      )
+      ...filteredTransactions.map(
+        (t) =>
+          `${t.id},${t.date},${t.type},${t.category},"${t.description}",${t.amount}`,
+      ),
     ].join("\n");
 
-    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
     const link = document.createElement("a");
     const url = URL.createObjectURL(blob);
     link.setAttribute("href", url);
-    link.setAttribute("download", `transactions_${format(new Date(), 'yyyy-MM-dd')}.csv`);
-    link.style.visibility = 'hidden';
+    link.setAttribute(
+      "download",
+      `transactions_${format(new Date(), "yyyy-MM-dd")}.csv`,
+    );
+    link.style.visibility = "hidden";
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
   };
 
   const handleSave = () => {
-    if (!formData.description || !formData.amount || isNaN(Number(formData.amount))) return;
+    if (
+      !formData.description ||
+      !formData.amount ||
+      isNaN(Number(formData.amount))
+    )
+      return;
 
     const payload = {
       description: formData.description,
       amount: Number(formData.amount),
       type: formData.type as "income" | "expense",
       category: formData.category,
-      date: new Date(formData.date).toISOString()
+      date: new Date(formData.date).toISOString(),
     };
 
     if (editingTx) {
@@ -123,7 +149,7 @@ export default function Transactions() {
       amount: "",
       type: "expense",
       category: CATEGORIES[0],
-      date: new Date().toISOString().split('T')[0]
+      date: new Date().toISOString().split("T")[0],
     });
   };
 
@@ -134,7 +160,7 @@ export default function Transactions() {
       amount: tx.amount.toString(),
       type: tx.type,
       category: tx.category,
-      date: tx.date.split('T')[0]
+      date: tx.date.split("T")[0],
     });
     setIsFormOpen(true);
   };
@@ -147,9 +173,9 @@ export default function Transactions() {
       setSortDir("desc");
     }
   };
-
+console.log(filteredTransactions);
   return (
-    <motion.div 
+    <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       className="space-y-6"
@@ -157,16 +183,25 @@ export default function Transactions() {
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <h1 className="text-3xl font-bold tracking-tight">Transactions</h1>
-          <p className="text-muted-foreground mt-1">Manage and view your financial history.</p>
+          <p className="text-muted-foreground mt-1">
+            Manage and view your financial history.
+          </p>
         </div>
-        
+
         {role === "admin" && (
           <div className="flex items-center gap-2">
-            <Button variant="outline" onClick={handleExport} data-testid="btn-export">
+            <Button
+              variant="outline"
+              onClick={handleExport}
+              data-testid="btn-export"
+            >
               <Download className="w-4 h-4 mr-2" />
               Export
             </Button>
-            <Button onClick={() => setIsFormOpen(true)} data-testid="btn-add-tx">
+            <Button
+              onClick={() => setIsFormOpen(true)}
+              data-testid="btn-add-tx"
+            >
               <Plus className="w-4 h-4 mr-2" />
               Add Record
             </Button>
@@ -179,15 +214,15 @@ export default function Transactions() {
           <div className="flex flex-col sm:flex-row items-center gap-4 mb-6">
             <div className="relative w-full sm:max-w-xs">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-              <Input 
-                placeholder="Search transactions..." 
+              <Input
+                placeholder="Search transactions..."
                 className="pl-9"
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
                 data-testid="input-search-tx"
               />
             </div>
-            
+
             <div className="flex w-full sm:w-auto items-center gap-2 flex-wrap">
               <Select value={typeFilter} onValueChange={setTypeFilter}>
                 <SelectTrigger className="w-[110px]">
@@ -207,7 +242,11 @@ export default function Transactions() {
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="all">All Categories</SelectItem>
-                  {CATEGORIES.map(c => <SelectItem key={c} value={c}>{c}</SelectItem>)}
+                  {CATEGORIES.map((c) => (
+                    <SelectItem key={c} value={c}>
+                      {c}
+                    </SelectItem>
+                  ))}
                 </SelectContent>
               </Select>
             </div>
@@ -217,25 +256,25 @@ export default function Transactions() {
             <div className="grid grid-cols-12 gap-4 p-4 font-medium text-sm text-muted-foreground border-b border-border bg-muted/40">
               <div className="col-span-5 sm:col-span-4">Description</div>
               <div className="col-span-3 hidden sm:block">Category</div>
-              <div 
+              <div
                 className="col-span-4 sm:col-span-3 flex items-center gap-1 cursor-pointer hover:text-foreground select-none"
                 onClick={() => toggleSort("date")}
               >
                 Date <ArrowUpDown className="w-3 h-3" />
               </div>
-              <div 
+              <div
                 className="col-span-3 sm:col-span-2 flex items-center justify-end gap-1 cursor-pointer hover:text-foreground select-none"
                 onClick={() => toggleSort("amount")}
               >
                 <ArrowUpDown className="w-3 h-3" /> Amount
               </div>
             </div>
-            
+
             <div className="divide-y divide-border">
               <AnimatePresence>
                 {filteredTransactions.length > 0 ? (
-                  filteredTransactions.map(tx => (
-                    <motion.div 
+                  filteredTransactions.map((tx) => (
+                    <motion.div
                       key={tx.id}
                       initial={{ opacity: 0 }}
                       animate={{ opacity: 1 }}
@@ -243,43 +282,62 @@ export default function Transactions() {
                       className="grid grid-cols-12 gap-4 p-4 items-center hover:bg-muted/50 transition-colors text-sm"
                     >
                       <div className="col-span-5 sm:col-span-4 flex items-center gap-3 overflow-hidden">
-                        <div className={cn(
-                          "w-8 h-8 rounded-full flex items-center justify-center shrink-0 hidden sm:flex",
-                          tx.type === "income" ? "bg-emerald-500/10 text-emerald-500" : "bg-destructive/10 text-destructive"
-                        )}>
-                          {tx.type === "income" ? <ArrowUpRight className="w-4 h-4" /> : <ArrowDownRight className="w-4 h-4" />}
+                        <div
+                          className={cn(
+                            "w-8 h-8 rounded-full  items-center justify-center shrink-0 hidden sm:flex",
+                            tx.type === "income"
+                              ? "bg-emerald-500/10 text-emerald-500"
+                              : "bg-destructive/10 text-destructive",
+                          )}
+                        >
+                          {tx.type === "income" ? (
+                            <ArrowUpRight className="w-4 h-4" />
+                          ) : (
+                            <ArrowDownRight className="w-4 h-4" />
+                          )}
                         </div>
-                        <span className="font-medium truncate">{tx.description}</span>
+                        <span className="font-medium truncate">
+                          {tx.description}
+                        </span>
                       </div>
-                      
+
                       <div className="col-span-3 hidden sm:block text-muted-foreground truncate">
                         {tx.category}
                       </div>
-                      
+
                       <div className="col-span-4 sm:col-span-3 text-muted-foreground">
-                        {format(parseISO(tx.date), 'MMM d, yyyy')}
+                        {format(parseISO(tx.date), "MMM d, yyyy")}
                       </div>
-                      
+
                       <div className="col-span-3 sm:col-span-2 flex items-center justify-end gap-2">
-                        <span className={cn(
-                          "font-medium whitespace-nowrap",
-                          tx.type === "income" ? "text-emerald-500" : ""
-                        )}>
-                          {tx.type === "income" ? "+" : "-"}${tx.amount.toLocaleString()}
+                        <span
+                          className={cn(
+                            "font-medium whitespace-nowrap",
+                            tx.type === "income" ? "text-emerald-500" : "",
+                          )}
+                        >
+                          {tx.type === "income" ? "+" : "-"}₹{tx.amount.toLocaleString()}
                         </span>
-                        
+
                         {role === "admin" && (
                           <DropdownMenu>
                             <DropdownMenuTrigger asChild>
-                              <Button variant="ghost" size="icon" className="w-8 h-8 -mr-2 shrink-0">
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                className="w-8 h-8 -mr-2 shrink-0"
+                              >
                                 <MoreHorizontal className="w-4 h-4" />
                               </Button>
                             </DropdownMenuTrigger>
                             <DropdownMenuContent align="end">
-                              <DropdownMenuItem onClick={() => openEdit(tx)} data-testid={`edit-tx-${tx.id}`}>
+                              <DropdownMenuItem
+                                onClick={() => openEdit(tx)}
+                                data-testid={`edit-tx-${tx.id}`}
+                              >
                                 <Edit2 className="w-4 h-4 mr-2" /> Edit
                               </DropdownMenuItem>
-                              <DropdownMenuItem 
+                              <DropdownMenuItem
                                 className="text-destructive focus:bg-destructive/10 focus:text-destructive"
                                 onClick={() => deleteTransaction(tx.id)}
                                 data-testid={`delete-tx-${tx.id}`}
@@ -295,8 +353,12 @@ export default function Transactions() {
                 ) : (
                   <div className="p-12 text-center text-muted-foreground flex flex-col items-center">
                     <FileText className="w-12 h-12 mb-4 opacity-20" />
-                    <p className="text-lg font-medium text-foreground">No transactions found</p>
-                    <p className="text-sm">Try adjusting your filters or search query.</p>
+                    <p className="text-lg font-medium text-foreground">
+                      No transactions found
+                    </p>
+                    <p className="text-sm">
+                      Try adjusting your filters or search query.
+                    </p>
                   </div>
                 )}
               </AnimatePresence>
@@ -305,18 +367,26 @@ export default function Transactions() {
         </CardContent>
       </Card>
 
-      <Dialog open={isFormOpen} onOpenChange={(open) => {
-        setIsFormOpen(open);
-        if (!open) resetForm();
-      }}>
+      <Dialog
+        open={isFormOpen}
+        onOpenChange={(open) => {
+          setIsFormOpen(open);
+          if (!open) resetForm();
+        }}
+      >
         <DialogContent className="sm:max-w-[425px]">
           <DialogHeader>
-            <DialogTitle>{editingTx ? "Edit Transaction" : "New Transaction"}</DialogTitle>
+            <DialogTitle>
+              {editingTx ? "Edit Transaction" : "New Transaction"}
+            </DialogTitle>
           </DialogHeader>
           <div className="grid gap-4 py-4">
             <div className="grid gap-2">
               <Label htmlFor="type">Type</Label>
-              <Select value={formData.type} onValueChange={(v) => setFormData({...formData, type: v})}>
+              <Select
+                value={formData.type}
+                onValueChange={(v) => setFormData({ ...formData, type: v })}
+              >
                 <SelectTrigger data-testid="select-type">
                   <SelectValue />
                 </SelectTrigger>
@@ -326,59 +396,76 @@ export default function Transactions() {
                 </SelectContent>
               </Select>
             </div>
-            
+
             <div className="grid gap-2">
               <Label htmlFor="desc">Description</Label>
-              <Input 
-                id="desc" 
-                value={formData.description} 
-                onChange={(e) => setFormData({...formData, description: e.target.value})} 
+              <Input
+                id="desc"
+                value={formData.description}
+                onChange={(e) =>
+                  setFormData({ ...formData, description: e.target.value })
+                }
                 placeholder="e.g. Groceries"
                 data-testid="input-desc"
               />
             </div>
-            
+
             <div className="grid grid-cols-2 gap-4">
               <div className="grid gap-2">
                 <Label htmlFor="amount">Amount ($)</Label>
-                <Input 
-                  id="amount" 
-                  type="number" 
+                <Input
+                  id="amount"
+                  type="number"
                   min="0"
                   step="0.01"
-                  value={formData.amount} 
-                  onChange={(e) => setFormData({...formData, amount: e.target.value})} 
+                  value={formData.amount}
+                  onChange={(e) =>
+                    setFormData({ ...formData, amount: e.target.value })
+                  }
                   placeholder="0.00"
                   data-testid="input-amount"
                 />
               </div>
               <div className="grid gap-2">
                 <Label htmlFor="date">Date</Label>
-                <Input 
-                  id="date" 
-                  type="date" 
-                  value={formData.date} 
-                  onChange={(e) => setFormData({...formData, date: e.target.value})} 
+                <Input
+                  id="date"
+                  type="date"
+                  value={formData.date}
+                  onChange={(e) =>
+                    setFormData({ ...formData, date: e.target.value })
+                  }
                   data-testid="input-date"
                 />
               </div>
             </div>
-            
+
             <div className="grid gap-2">
               <Label htmlFor="category">Category</Label>
-              <Select value={formData.category} onValueChange={(v) => setFormData({...formData, category: v})}>
+              <Select
+                value={formData.category}
+                onValueChange={(v) => setFormData({ ...formData, category: v })}
+              >
                 <SelectTrigger data-testid="select-category">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  {CATEGORIES.map(c => <SelectItem key={c} value={c}>{c}</SelectItem>)}
+                  {CATEGORIES.map((c) => (
+                    <SelectItem key={c} value={c}>
+                      {c}
+                    </SelectItem>
+                  ))}
                 </SelectContent>
               </Select>
             </div>
           </div>
           <DialogFooter>
-            <Button variant="outline" onClick={() => setIsFormOpen(false)}>Cancel</Button>
-            <Button onClick={handleSave} data-testid="btn-save-tx">Save Record</Button>
+            <Button variant="outline" onClick={() => setIsFormOpen(false)}>
+              Cancel
+            </Button>
+            <Button onClick={handleSave} data-testid="btn-save-tx">
+              Save Record
+            </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>

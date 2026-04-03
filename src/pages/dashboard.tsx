@@ -131,7 +131,7 @@ export default function Dashboard() {
                 <div>
                   <p className="text-sm font-medium text-muted-foreground">Total Balance</p>
                   <h2 className="text-3xl font-bold mt-2">
-                    <AnimatedCounter value={stats.totalBalance} prefix="$" decimals={0} />
+                    <AnimatedCounter value={stats.totalBalance} prefix="₹" decimals={0} />
                   </h2>
                 </div>
                 <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center">
@@ -149,7 +149,7 @@ export default function Dashboard() {
                 <div>
                   <p className="text-sm font-medium text-muted-foreground">Monthly Income</p>
                   <h2 className="text-3xl font-bold mt-2">
-                    <AnimatedCounter value={stats.monthlyIncome} prefix="$" decimals={0} />
+                    <AnimatedCounter value={stats.monthlyIncome} prefix="₹" decimals={0} />
                   </h2>
                 </div>
                 <div className="w-12 h-12 rounded-full bg-emerald-500/10 flex items-center justify-center">
@@ -167,7 +167,7 @@ export default function Dashboard() {
                 <div>
                   <p className="text-sm font-medium text-muted-foreground">Monthly Expenses</p>
                   <h2 className="text-3xl font-bold mt-2">
-                    <AnimatedCounter value={stats.monthlyExpenses} prefix="$" decimals={0} />
+                    <AnimatedCounter value={stats.monthlyExpenses} prefix="₹" decimals={0} />
                   </h2>
                 </div>
                 <div className="w-12 h-12 rounded-full bg-destructive/10 flex items-center justify-center">
@@ -215,7 +215,7 @@ export default function Dashboard() {
                   </defs>
                   <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="hsl(var(--border))" />
                   <XAxis dataKey="month" stroke="hsl(var(--muted-foreground))" fontSize={12} tickLine={false} axisLine={false} />
-                  <YAxis stroke="hsl(var(--muted-foreground))" fontSize={12} tickLine={false} axisLine={false} tickFormatter={(val) => `$${val}`} />
+                  <YAxis stroke="hsl(var(--muted-foreground))" fontSize={12} tickLine={false} axisLine={false} tickFormatter={(val) => `₹${val}`} />
                   <Tooltip 
                     contentStyle={{ backgroundColor: 'hsl(var(--card))', borderColor: 'hsl(var(--border))', borderRadius: '8px' }}
                     itemStyle={{ color: 'hsl(var(--foreground))' }}
@@ -251,7 +251,7 @@ export default function Dashboard() {
                       ))}
                     </Pie>
                     <Tooltip 
-                      formatter={(value: number) => `$${value}`}
+                      formatter={(value: number) => `₹${value}`}
                       contentStyle={{ backgroundColor: 'hsl(var(--card))', borderColor: 'hsl(var(--border))', borderRadius: '8px' }}
                     />
                     <Legend />
@@ -296,7 +296,7 @@ export default function Dashboard() {
                     "font-medium",
                     tx.type === "income" ? "text-emerald-500" : "text-foreground"
                   )}>
-                    {tx.type === "income" ? "+" : "-"}${tx.amount.toLocaleString()}
+                    {tx.type === "income" ? "+" : "-"}₹{tx.amount.toLocaleString()}
                   </div>
                 </div>
               ))}
