@@ -70,28 +70,43 @@ export default function Transactions() {
   });
 
   const filteredTransactions = useMemo(() => {
-    let result = transactions.filter((t) => {
-      const matchSearch = t.description
-        .toLowerCase()
-        .includes(search.toLowerCase());
-      const matchType = typeFilter === "all" || t.type === typeFilter;
-      const matchCat =
-        categoryFilter === "all" || t.category === categoryFilter;
-      return matchSearch && matchType && matchCat;
-    });
+  // --- 1. Filter ---
+  const filtered = transactions.filter((t) => {
+    if (
+      search &&
+      !t.description.toLowerCase().includes(search.toLowerCase())
+    ) {
+      return false;
+    }
 
-    result.sort((a, b) => {
-      let comparison = 0;
-      if (sortBy === "date") {
-        comparison = new Date(a.date).getTime() - new Date(b.date).getTime();
-      } else {
-        comparison = a.amount - b.amount;
-      }
-      return sortDir === "asc" ? comparison : -comparison;
-    });
+    if (typeFilter !== "all" && t.type !== typeFilter) {
+      return false;
+    }
 
-    return result;
-  }, [transactions, search, typeFilter, categoryFilter, sortBy, sortDir]);
+    if (categoryFilter !== "all" && t.category !== categoryFilter) {
+      return false;
+    }
+
+    return true;
+  });
+
+  // --- 2. Sort ---
+  const sorted = [...filtered].sort((a, b) => {
+    const valueA =
+      sortBy === "date"
+        ? new Date(a.date).getTime()
+        : a.amount;
+
+    const valueB =
+      sortBy === "date"
+        ? new Date(b.date).getTime()
+        : b.amount;
+
+    return sortDir === "asc" ? valueA - valueB : valueB - valueA;
+  });
+
+  return sorted;
+}, [transactions, search, typeFilter, categoryFilter, sortBy, sortDir]);
 
   const handleExport = () => {
     const headers = ["ID", "Date", "Type", "Category", "Description", "Amount"];
@@ -225,7 +240,7 @@ export default function Transactions() {
 
             <div className="flex w-full sm:w-auto items-center gap-2 flex-wrap">
               <Select value={typeFilter} onValueChange={setTypeFilter}>
-                <SelectTrigger className="w-27.5">
+                <SelectTrigger className="w-auto">
                   <Filter className="w-4 h-4 mr-2 text-muted-foreground" />
                   <SelectValue placeholder="Type" />
                 </SelectTrigger>
@@ -237,7 +252,7 @@ export default function Transactions() {
               </Select>
 
               <Select value={categoryFilter} onValueChange={setCategoryFilter}>
-                <SelectTrigger className="w-27.5">
+                <SelectTrigger className="w-auto">
                   <SelectValue placeholder="Category" />
                 </SelectTrigger>
                 <SelectContent>
@@ -325,7 +340,7 @@ export default function Transactions() {
                               <Button
                                 variant="ghost"
                                 size="icon"
-                                className="w-8 h-8 -mr-2 shrink-0"
+                                className="w-8 h-8 -mr-2 shrink-0 cursor-pointer"
                               >
                                 <MoreHorizontal className="w-4 h-4" />
                               </Button>
@@ -412,7 +427,7 @@ export default function Transactions() {
 
             <div className="grid grid-cols-2 gap-4">
               <div className="grid gap-2">
-                <Label htmlFor="amount">Amount ($)</Label>
+                <Label htmlFor="amount">Amount (₹)</Label>
                 <Input
                   id="amount"
                   type="number"

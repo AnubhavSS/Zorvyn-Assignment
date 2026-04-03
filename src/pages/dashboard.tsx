@@ -204,7 +204,7 @@ export default function Dashboard() {
               <CardTitle>Balance Trend</CardTitle>
               <CardDescription>Your total balance over the last 6 months</CardDescription>
             </CardHeader>
-            <CardContent className="h-[300px]">
+            <CardContent className="h-75">
               <ResponsiveContainer width="100%" height="100%">
                 <AreaChart data={trendData} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
                   <defs>
@@ -233,7 +233,7 @@ export default function Dashboard() {
               <CardTitle>Spending</CardTitle>
               <CardDescription>Top expense categories</CardDescription>
             </CardHeader>
-            <CardContent className="h-[300px] flex flex-col justify-center">
+            <CardContent className="h-75 flex flex-col justify-center">
               {categoryData.length > 0 ? (
                 <ResponsiveContainer width="100%" height="100%">
                   <PieChart>

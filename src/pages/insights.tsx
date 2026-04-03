@@ -2,7 +2,7 @@ import React, { useMemo } from "react";
 import { useStore } from "@/lib/store";
 import { motion } from "framer-motion";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { Lightbulb, TrendingDown, TrendingUp, AlertTriangle } from "lucide-react";
+import { Lightbulb, AlertTriangle } from "lucide-react";
 import { BarChart, Bar, Legend, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell } from "recharts";
 import { subMonths, isSameMonth, format } from "date-fns";
 
@@ -132,7 +132,7 @@ const insights = useMemo(() => {
               <CardTitle>Top Spending Categories</CardTitle>
               <CardDescription>Where your money goes (All Time)</CardDescription>
             </CardHeader>
-            <CardContent className="h-[300px]">
+            <CardContent className="h-75">
               <ResponsiveContainer width="100%" height="100%">
                 <BarChart
                   data={insights.categoryExpenses}
@@ -163,7 +163,7 @@ const insights = useMemo(() => {
             <CardHeader>
               <CardTitle>Income vs Expenses</CardTitle>
             </CardHeader>
-            <CardContent className="h-[300px]">
+            <CardContent className="h-75">
               <ResponsiveContainer width="100%" height="100%">
                 <BarChart data={insights.monthlyData} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
                   <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="var(--color-border)" />

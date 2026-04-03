@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 import { useStore } from "@/lib/store";
-import { Switch, Route, Router as WouterRouter, Redirect } from "wouter";
+import { Switch, Route, Redirect } from "wouter";
 import NotFound from "@/pages/not-found";
 import { Shell } from "@/components/layout/Shell";
 
