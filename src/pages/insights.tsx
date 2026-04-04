@@ -21,55 +21,68 @@ const item = {
   show: { opacity: 1, y: 0 }
 };
 
+/**
+ * Insights Page Component
+ * 
+ * Provides automated financial analysis and behavioral patterns based on user data.
+ * Features:
+ * - Smart cards summarizing primary expenses and savings health.
+ * - Bar charts showing category-wise spending (All Time).
+ * - Side-by-side comparison of Income vs Expenses (Last 6 Months).
+ */
 export default function Insights() {
   const { transactions } = useStore();
 
-const insights = useMemo(() => {
-  const now = new Date();
+  /**
+   * Generates analytical insights by processing historical transaction data.
+   */
+  const insights = useMemo(() => {
+    const now = new Date();
 
-  // --- 1. Category totals (for top category) ---
-  const categoryTotals: Record<string, number> = {};
+    // Aggregates total expenses for each category
+    const categoryTotals: Record<string, number> = {};
 
-  // --- 2. Monthly trend (last 6 months) ---
-  const monthlyData = Array.from({ length: 6 }, (_, i) => {
-    const date = subMonths(now, 5 - i);
+    // Generate monthly comparison data for the last 6 months
+    const monthlyData = Array.from({ length: 6 }, (_, i) => {
+      const date = subMonths(now, 5 - i);
 
-    const monthTx = transactions.filter((tx) =>
-      isSameMonth(new Date(tx.date), date)
-    );
+      const monthTx = transactions.filter((tx) =>
+        isSameMonth(new Date(tx.date), date)
+      );
 
-    let income = 0;
-    let expense = 0;
+      let income = 0;
+      let expense = 0;
 
-    monthTx.forEach((t) => {
-      if (t.type === "income") income += t.amount;
-      else {
-        expense += t.amount;
+      monthTx.forEach((t) => {
+        if (t.type === "income") income += t.amount;
+        else {
+          expense += t.amount;
 
-        // build category totals at same time
-        categoryTotals[t.category] =
-          (categoryTotals[t.category] || 0) + t.amount;
-      }
+          // Track category-wise totals concurrently
+          categoryTotals[t.category] =
+            (categoryTotals[t.category] || 0) + t.amount;
+        }
+      });
+
+      return {
+        month: format(date, "MMM"),
+        Income: income,
+        Expense: expense,
+      };
     });
 
+    // Sort category data for horizontal bar charts
+    const categoryExpenses = Object.entries(categoryTotals)
+      .map(([name, value]) => ({ name, value }))
+      .sort((a, b) => b.value - a.value);
+
+
     return {
-      month: format(date, "MMM"),
-      Income: income,
-      Expense: expense,
+      monthlyData,
+      categoryExpenses,
     };
-  });
+  }, [transactions]);
 
-   // --- 3. Category array (for pie chart etc.) ---
-  const categoryExpenses = Object.entries(categoryTotals)
-    .map(([name, value]) => ({ name, value }))
-    .sort((a, b) => b.value - a.value);
-
-
-  return {
-    monthlyData,
-    categoryExpenses,
-  };
-}, [transactions]);
 
   const COLORS = ['hsl(var(--chart-1))', 'hsl(var(--chart-2))', 'hsl(var(--chart-3))', 'hsl(var(--chart-4))', 'hsl(var(--chart-5))'];
   console.log(insights.categoryExpenses)
@@ -126,6 +139,7 @@ const insights = useMemo(() => {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        {/* Top Spending Categories */}
         <motion.div variants={item}>
           <Card className="h-full">
             <CardHeader>
@@ -158,6 +172,7 @@ const insights = useMemo(() => {
           </Card>
         </motion.div>
 
+        {/* Income vs Expenses */}
         <motion.div variants={item}>
           <Card className="h-full">
             <CardHeader>

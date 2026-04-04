@@ -27,9 +27,22 @@ const item = {
   show: { opacity: 1, y: 0 }
 };
 
+/**
+ * Dashboard Page Component
+ * 
+ * Provides a high-level overview of the user's financial status.
+ * Features:
+ * - Summary statistics (Balance, Monthly Income/Expenses, Savings Rate).
+ * - Visualizations (Balance Trend area chart, Spending by Category pie chart).
+ * - List of recent transactions.
+ * - Responsive layout with staggered animations.
+ */
 export default function Dashboard() {
   const { transactions } = useStore();
 
+  /**
+   * Calculates high-level financial statistics for the current month and overall.
+   */
   const stats = useMemo(() => {
     const now = new Date();
     const currentMonth = now.getMonth();
@@ -41,19 +54,23 @@ export default function Dashboard() {
 
     transactions.forEach(t => {
       const d = new Date(t.date);
+      // Calculate running total balance
       if (t.type === "income") {
         totalBalance += t.amount;
+        // Calculate income for current month
         if (d.getMonth() === currentMonth && d.getFullYear() === currentYear) {
           monthlyIncome += t.amount;
         }
       } else {
         totalBalance -= t.amount;
+        // Calculate expenses for current month
         if (d.getMonth() === currentMonth && d.getFullYear() === currentYear) {
           monthlyExpenses += t.amount;
         }
       }
     });
 
+    // Savings rate as a percentage of income
     const savingsRate = monthlyIncome > 0 
       ? Math.max(0, ((monthlyIncome - monthlyExpenses) / monthlyIncome) * 100).toFixed(1)
       : "0.0";
@@ -61,12 +78,15 @@ export default function Dashboard() {
     return { totalBalance, monthlyIncome, monthlyExpenses, savingsRate };
   }, [transactions]);
 
+  /**
+   * Generates data for the balance trend chart over the last 6 months.
+   */
   const trendData = useMemo(() => {
     const data = [];
     const now = new Date();
     let runningBalance = 0;
 
-    // Calculate initial balance 6 months ago
+    // Calculate starting balance from before the 6-month window
     const sixMonthsAgo = subMonths(now, 5);
     transactions.forEach(t => {
       const d = new Date(t.date);
@@ -75,6 +95,7 @@ export default function Dashboard() {
       }
     });
 
+    // Generate monthly data points
     for (let i = 5; i >= 0; i--) {
       const targetMonth = subMonths(now, i);
       
@@ -96,6 +117,10 @@ export default function Dashboard() {
     return data;
   }, [transactions]);
 
+  /**
+   * Aggregates expenses by category for the pie chart.
+   * Limits to the top 5 categories by spending.
+   */
   const categoryData = useMemo(() => {
     const expenses = transactions.filter(t => t.type === "expense");
     const grouped: Record<string, number> = {};
@@ -108,6 +133,7 @@ export default function Dashboard() {
       .sort((a, b) => b.value - a.value)
       .slice(0, 5); // top 5
   }, [transactions]);
+
 
   const COLORS = ['hsl(var(--chart-1))', 'hsl(var(--chart-2))', 'hsl(var(--chart-3))', 'hsl(var(--chart-4))', 'hsl(var(--chart-5))'];
 
@@ -198,6 +224,8 @@ export default function Dashboard() {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+    
+        {/* Balance Trend */}
         <motion.div variants={item} className="lg:col-span-2">
           <Card className="h-full">
             <CardHeader>
@@ -227,6 +255,7 @@ export default function Dashboard() {
           </Card>
         </motion.div>
 
+        {/* Spending */}
         <motion.div variants={item}>
           <Card className="h-full">
             <CardHeader>

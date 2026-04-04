@@ -42,7 +42,18 @@ import { Label } from "@/components/ui/label";
 import { CATEGORIES } from "@/lib/mock-data";
 import { cn } from "@/lib/utils";
 
+/**
+ * Transactions Page Component
+ * 
+ * Provides a comprehensive interface for viewing, filtering, sorting, and managing financial transactions.
+ * Includes functionality for:
+ * - Real-time searching and filtering by type and category.
+ * - Sorting by date and amount.
+ * - Exporting data to CSV.
+ * - CRUD operations (Create, Read, Update, Delete) for transactions (Admin only).
+ */
 export default function Transactions() {
+  // Store state and actions
   const {
     transactions,
     role,
@@ -51,16 +62,18 @@ export default function Transactions() {
     deleteTransaction,
   } = useStore();
 
+  // Filter and Sort state
   const [search, setSearch] = useState("");
   const [typeFilter, setTypeFilter] = useState("all");
   const [categoryFilter, setCategoryFilter] = useState("all");
   const [sortBy, setSortBy] = useState<"date" | "amount">("date");
   const [sortDir, setSortDir] = useState<"asc" | "desc">("desc");
 
+  // Modal and Form state
   const [isFormOpen, setIsFormOpen] = useState<boolean>(false);
   const [editingTx, setEditingTx] = useState<any>(null);
 
-  // Form state
+  /** Initial form state for new/editing transactions */
   const [formData, setFormData] = useState({
     description: "",
     amount: "",
@@ -69,45 +82,54 @@ export default function Transactions() {
     date: new Date().toISOString().split("T")[0],
   });
 
+  /**
+   * Memoized filtered and sorted transactions based on current UI state.
+   */
   const filteredTransactions = useMemo(() => {
-  // --- 1. Filter ---
-  const filtered = transactions.filter((t) => {
-    if (
-      search &&
-      !t.description.toLowerCase().includes(search.toLowerCase())
-    ) {
-      return false;
-    }
+    // --- 1. Filter Logic ---
+    const filtered = transactions.filter((t) => {
+      // Search by description
+      if (
+        search &&
+        !t.description.toLowerCase().includes(search.toLowerCase())
+      ) {
+        return false;
+      }
 
-    if (typeFilter !== "all" && t.type !== typeFilter) {
-      return false;
-    }
+      // Filter by type (income/expense)
+      if (typeFilter !== "all" && t.type !== typeFilter) {
+        return false;
+      }
 
-    if (categoryFilter !== "all" && t.category !== categoryFilter) {
-      return false;
-    }
+      // Filter by category
+      if (categoryFilter !== "all" && t.category !== categoryFilter) {
+        return false;
+      }
 
-    return true;
-  });
+      return true;
+    });
 
-  // --- 2. Sort ---
-  const sorted = [...filtered].sort((a, b) => {
-    const valueA =
-      sortBy === "date"
-        ? new Date(a.date).getTime()
-        : a.amount;
+    // --- 2. Sort Logic ---
+    const sorted = [...filtered].sort((a, b) => {
+      const valueA =
+        sortBy === "date"
+          ? new Date(a.date).getTime()
+          : a.amount;
 
-    const valueB =
-      sortBy === "date"
-        ? new Date(b.date).getTime()
-        : b.amount;
+      const valueB =
+        sortBy === "date"
+          ? new Date(b.date).getTime()
+          : b.amount;
 
-    return sortDir === "asc" ? valueA - valueB : valueB - valueA;
-  });
+      return sortDir === "asc" ? valueA - valueB : valueB - valueA;
+    });
 
-  return sorted;
-}, [transactions, search, typeFilter, categoryFilter, sortBy, sortDir]);
+    return sorted;
+  }, [transactions, search, typeFilter, categoryFilter, sortBy, sortDir]);
 
+  /**
+   * Exports the currently filtered transactions to a CSV file.
+   */
   const handleExport = () => {
     const headers = ["ID", "Date", "Type", "Category", "Description", "Amount"];
     const csvContent = [
@@ -132,7 +154,11 @@ export default function Transactions() {
     document.body.removeChild(link);
   };
 
+  /**
+   * Validates and saves the transaction (either new or updated).
+   */
   const handleSave = () => {
+    // Basic validation
     if (
       !formData.description ||
       !formData.amount ||
@@ -157,6 +183,7 @@ export default function Transactions() {
     resetForm();
   };
 
+  /** Resets the form state to defaults */
   const resetForm = () => {
     setEditingTx(null);
     setFormData({
@@ -168,6 +195,9 @@ export default function Transactions() {
     });
   };
 
+  /**
+   * Pre-fills the form with existing transaction data for editing.
+   */
   const openEdit = (tx: any) => {
     setEditingTx(tx);
     setFormData({
@@ -180,6 +210,9 @@ export default function Transactions() {
     setIsFormOpen(true);
   };
 
+  /**
+   * Toggles sort direction or changes the sort field.
+   */
   const toggleSort = (field: "date" | "amount") => {
     if (sortBy === field) {
       setSortDir(sortDir === "asc" ? "desc" : "asc");
@@ -188,6 +221,7 @@ export default function Transactions() {
       setSortDir("desc");
     }
   };
+
 
   return (
     <motion.div
@@ -205,6 +239,7 @@ export default function Transactions() {
 
         {role === "admin" && (
           <div className="flex items-center gap-2">
+            {/* Export Button */}
             <Button
               variant="outline"
               onClick={handleExport}
@@ -213,6 +248,8 @@ export default function Transactions() {
               <Download className="w-4 h-4 mr-2" />
               Export
             </Button>
+
+            {/* Add Record Button */}
             <Button
               onClick={() => setIsFormOpen(true)}
               data-testid="btn-add-tx"
@@ -225,6 +262,7 @@ export default function Transactions() {
       </div>
 
       <Card>
+        {/* Search and Filter */}
         <CardContent className="p-4 sm:p-6">
           <div className="flex flex-col sm:flex-row items-center gap-4 mb-6">
             <div className="relative w-full sm:max-w-xs">
