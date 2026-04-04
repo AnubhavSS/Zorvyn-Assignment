@@ -36,6 +36,7 @@ It provides:
 - Local persistence to simulate real-world usage
 
 ## Project Structure
+```
 src/
 ├── pages/      
 │   ├── dashboard.tsx           
@@ -49,22 +50,23 @@ src/
 │       ├── Header.tsx           
 │       ├── Shell.tsx        
 │       ├── Sidebar.tsx      
-|   └── ui/
+│   └── ui/
 │       ├── avatar.tsx           
 │       ├── button.tsx        
 │       ├── card.tsx  etc. 
-|
+│
 │
 ├── lib/
 │   ├── mockData.ts              
 │   ├── store.tsx   
 │   ├── types.ts      
 │   ├── utils.tsx  
-|
-|        
+│
+│        
 ├── App.tsx                     
 ├── index.css
 └──main.tsx   
+```
 
 ## Getting Started
 
